@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Animal Detectives 🔍 – must / can’t / may / might / could</title>
+<style>
+:root{
+  --teal:#13707a; --teal-d:#0c4f57; --mint:#e3f4f2; --peach:#fde1cd; --peach-d:#f4b58a;
+  --ink:#17323a; --paper:#fffdfa; --good:#2e9e6b; --good-bg:#e0f5ea; --bad:#d9534f; --bad-bg:#fde8e6; --gold:#f2b632;
+  --head:"Fredoka One","Baloo 2","Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI","Trebuchet MS",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:90px}
+body{margin:0;font-family:var(--body);color:var(--ink);background:linear-gradient(180deg,#d9f0ee 0%,#eef9f7 45%,#fff3e8 100%);min-height:100vh;touch-action:manipulation;overflow-x:hidden}
+button{font-family:inherit;touch-action:manipulation;cursor:pointer}
+.paws{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.paws span{position:absolute;font-size:34px;opacity:.13;animation:drift 18s linear infinite}
+@keyframes drift{from{transform:translateY(105vh) rotate(0)}to{transform:translateY(-15vh) rotate(40deg)}}
+#bar{position:sticky;top:0;z-index:20;background:var(--teal);color:#fff;padding:calc(env(safe-area-inset-top,0px) + 8px) 14px 8px;display:flex;align-items:center;gap:12px;box-shadow:0 3px 0 var(--teal-d)}
+#bar .logo{font-family:var(--head);font-size:20px;letter-spacing:.3px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{background:#fff;color:var(--teal-d);border-radius:999px;padding:5px 14px;font-weight:800;font-size:17px;display:flex;align-items:center;gap:6px;min-height:38px}
+#bar .snd{background:transparent;border:2px solid #ffffff88;color:#fff;border-radius:50%;width:40px;height:40px;font-size:18px}
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:16px 14px 70px}
+.screen{display:none}.screen.on{display:block}
+/* hero */
+.hero{display:flex;gap:16px;align-items:center;background:var(--paper);border:3px solid var(--teal);border-radius:26px;padding:16px 18px;box-shadow:0 6px 0 var(--teal)}
+.hero svg{flex:0 0 120px;width:120px;height:auto}
+.hero h1{font-family:var(--head);font-weight:400;font-size:clamp(30px,7vw,52px);line-height:1;margin:0 0 8px;color:var(--teal)}
+.hero .sub{display:inline-block;background:var(--peach);border-radius:999px;padding:6px 16px;font-weight:800;font-size:17px}
+.who{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.who label{font-weight:800;font-size:15px;display:block;margin-bottom:4px}
+input[type=text],textarea{width:100%;font:inherit;font-size:16px;padding:11px 14px;border:3px solid var(--teal);border-radius:14px;background:#fff;color:var(--ink)}
+input:focus,textarea:focus,button:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
+.rules{background:var(--mint);border:3px solid var(--teal);border-radius:22px;padding:14px 18px;margin-bottom:18px}
+.rules h2{font-family:var(--head);font-weight:400;font-size:22px;margin:0 0 8px;color:var(--teal-d)}
+.rules ul{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.rules li{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;font-size:18px}
+.rules b{color:var(--teal);font-size:20px}
+.rules .ar{margin-inline-start:auto;font-size:15px;opacity:.8;direction:rtl}
+.rules .pat{margin-top:8px;font-weight:800;background:#fff;border-radius:12px;padding:6px 12px;display:inline-block}
+.cases{display:grid;gap:14px}
+.case{display:flex;align-items:center;gap:14px;text-align:start;width:100%;background:var(--paper);border:3px solid var(--teal);border-radius:22px;padding:14px 16px;box-shadow:0 5px 0 var(--teal);transition:transform .12s}
+.case:active{transform:translateY(4px);box-shadow:0 1px 0 var(--teal)}
+.case .letter{flex:0 0 58px;height:58px;border-radius:50%;background:var(--peach);border:3px solid var(--peach-d);font-family:var(--head);font-size:30px;display:grid;place-items:center;color:var(--teal-d)}
+.case .t{flex:1}.case .t b{display:block;font-size:20px}.case .t span{font-size:15px;opacity:.8}
+.case .st{font-weight:800;font-size:15px;text-align:end;min-width:78px}
+.case.done{background:var(--good-bg);border-color:var(--good);box-shadow:0 5px 0 var(--good)}
+.case.done .letter{background:var(--good);border-color:var(--good);color:#fff}
+.big{display:block;margin:22px auto 0;font-family:var(--head);font-size:22px;background:var(--gold);color:var(--ink);border:3px solid #b98310;border-radius:999px;padding:13px 30px;box-shadow:0 5px 0 #b98310;min-height:52px}
+.big:active{transform:translateY(4px);box-shadow:0 1px 0 #b98310}
+.big[disabled]{background:#ddd;border-color:#aaa;box-shadow:0 5px 0 #aaa;color:#777;cursor:not-allowed}
+.ghost{background:#fff;border:3px solid var(--teal);color:var(--teal-d);border-radius:999px;padding:8px 18px;font-weight:800;font-size:16px;min-height:44px}
+/* stage */
+.sbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sbar h2{font-family:var(--head);font-weight:400;font-size:clamp(20px,4.5vw,28px);margin:0;flex:1;color:var(--teal-d)}
+.dots{display:flex;gap:7px;margin-bottom:14px}
+.dots i{flex:1;height:12px;border-radius:99px;background:#fff;border:2px solid var(--teal)}
+.dots i.ok{background:var(--good);border-color:var(--good)}.dots i.no{background:var(--bad);border-color:var(--bad)}.dots i.now{background:var(--gold);border-color:#b98310}
+.card{background:var(--paper);border:3px solid var(--teal);border-radius:26px;padding:18px;box-shadow:0 6px 0 var(--teal)}
+.task{display:inline-block;background:var(--teal);color:#fff;border-radius:999px;padding:5px 16px;font-weight:800;font-size:16px;margin-bottom:12px}
+.evid{display:flex;align-items:center;justify-content:center;gap:14px;margin:4px 0 16px;flex-wrap:wrap}
+.ebox{background:var(--mint);border:3px dashed var(--teal);border-radius:20px;padding:10px 16px;text-align:center;min-width:120px}
+.ebox .ic{font-size:50px;line-height:1.1;display:block}
+.ebox small{font-weight:800;font-size:14px;color:var(--teal-d)}
+.ebox.sus .ic{transition:filter .5s}
+.ebox.sus.hid .ic{filter:blur(7px) grayscale(1)}
+.arrow{font-size:28px;color:var(--teal)}
+.sent{font-size:clamp(20px,4.6vw,27px);font-weight:800;line-height:1.55;text-align:center;margin:8px 0 16px}
+.sent .clue{display:block;color:var(--teal-d)}
+.slot{display:inline-block;min-width:118px;border-bottom:4px solid var(--teal);margin:0 4px;padding:0 8px;color:var(--teal);font-family:var(--head);font-weight:400;font-size:1.05em;text-align:center}
+.slot.ok{background:var(--good-bg);border-radius:10px;border-color:var(--good);color:var(--good)}
+.opts{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.opt{font-family:var(--head);font-size:clamp(20px,4.5vw,26px);background:#fff;color:var(--teal-d);border:3px solid var(--teal);border-radius:20px;padding:14px 12px;box-shadow:0 5px 0 var(--teal);min-height:60px;transition:transform .1s}
+.opt.long{font-family:var(--body);font-weight:800;font-size:clamp(17px,3.8vw,21px);text-align:start;line-height:1.35}
+.opt:active{transform:translateY(4px);box-shadow:0 1px 0 var(--teal)}
+.opt.good{background:var(--good);border-color:#1d6e48;box-shadow:0 5px 0 #1d6e48;color:#fff}
+.opt.bad{background:var(--bad-bg);border-color:var(--bad);box-shadow:none;color:#999;text-decoration:line-through;animation:shake .4s}
+.opt[disabled]{cursor:default}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.fb{margin-top:16px;border-radius:18px;padding:12px 16px;font-size:18px;font-weight:700;display:none;line-height:1.5}
+.fb.show{display:block}.fb.g{background:var(--good-bg);border:3px solid var(--good)}.fb.b{background:var(--bad-bg);border:3px solid var(--bad)}
+.fb .ar{display:block;direction:rtl;font-size:16px;opacity:.85;margin-top:4px;font-weight:600}
+.nextrow{display:flex;justify-content:center;margin-top:6px}
+/* writing */
+.fld{margin:12px 0}.fld label{display:block;font-weight:800;margin-bottom:5px;font-size:18px}
+.hint{font-size:15px;opacity:.8;margin:2px 0 0}
+.note{margin-top:8px;font-weight:700;font-size:16px}
+.note.g{color:var(--good)}.note.b{color:var(--bad)}
+.file{margin-top:16px;background:var(--peach);border:3px solid var(--peach-d);border-radius:20px;padding:14px 18px;display:none}
+.file.show{display:block}.file h3{font-family:var(--head);font-weight:400;margin:0 0 6px;font-size:22px}
+.file p{margin:4px 0;font-size:19px;font-weight:700}
+.because{margin-top:12px;background:#fff;border:3px solid var(--teal);border-radius:20px;padding:10px 16px;font-weight:800;text-align:center}
+/* results */
+.res{text-align:center}
+.res h2{font-family:var(--head);font-weight:400;font-size:clamp(28px,7vw,44px);margin:0 0 4px;color:var(--teal)}
+.stars{font-size:54px;letter-spacing:6px;margin:6px 0}
+.stars .off{filter:grayscale(1);opacity:.25}
+.bigscore{font-family:var(--head);font-size:clamp(44px,12vw,76px);color:var(--teal-d);line-height:1}
+.rank{display:inline-block;background:var(--gold);border:3px solid #b98310;border-radius:999px;padding:6px 22px;font-family:var(--head);font-size:22px;margin:10px 0}
+.brk{display:grid;gap:8px;max-width:420px;margin:14px auto;text-align:start}
+.brk div{display:flex;justify-content:space-between;background:var(--mint);border-radius:14px;padding:9px 16px;font-weight:800;font-size:18px}
+.msg{font-size:19px;font-weight:700;margin:10px 0}
+.msg .ar{display:block;direction:rtl;margin-top:6px;color:var(--teal-d)}
+.btns{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:14px}
+footer{position:relative;z-index:1;text-align:center;padding:10px 14px calc(env(safe-area-inset-bottom,0px) + 22px);font-weight:800;color:var(--teal-d)}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:50}
+@media (max-width:560px){.hero{flex-direction:column;text-align:center}.who{grid-template-columns:1fr}.rules .ar{margin-inline-start:0;width:100%}.case .st{min-width:0}}
+@media (prefers-reduced-motion:reduce){.paws span{animation:none}.opt.bad{animation:none}}
+</style>
+</head>
+<body>
+<div class="paws" aria-hidden="true"></div>
+<div id="bar">
+  <div class="logo">🔍 Animal Detectives</div>
+  <div class="pill" title="Score">⭐ <span id="sc">0</span> / <span id="mx">120</span></div>
+  <button class="snd" id="snd" aria-label="Sound on/off">🔊</button>
+</div>
+
+<div class="wrap">
+  <!-- HOME -->
+  <section id="home" class="screen on">
+    <div class="hero">
+      <svg viewBox="0 0 140 170" aria-hidden="true">
+        <path d="M18 170 C14 120 30 100 70 100 C110 100 126 120 122 170Z" fill="#26407a"/>
+        <path d="M52 100 L70 128 L88 100Z" fill="#fff"/>
+        <path d="M20 70 C20 22 50 8 70 8 C92 8 120 24 120 70 C120 104 112 120 100 128 L40 128 C28 120 20 104 20 70Z" fill="#fff" stroke="#d9e6e5" stroke-width="3"/>
+        <ellipse cx="70" cy="70" rx="33" ry="38" fill="#f5c9a2"/>
+        <path d="M34 62 C40 30 100 30 106 62 C92 46 48 46 34 62Z" fill="#fff"/>
+        <circle cx="56" cy="72" r="4" fill="#3b2a20"/>
+        <path d="M74 72 q8 -6 16 0" stroke="#3b2a20" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <path d="M58 92 q12 10 24 0" stroke="#b5503c" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <circle cx="48" cy="86" r="6" fill="#f2a58e" opacity=".6"/><circle cx="92" cy="86" r="6" fill="#f2a58e" opacity=".6"/>
+        <circle cx="104" cy="66" r="19" fill="#d9f0ee88" stroke="#3a3a3a" stroke-width="5"/>
+        <path d="M117 80 L132 100" stroke="#3a3a3a" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1>Animal Detectives</h1>
+        <span class="sub">Read the clues. Make a deduction!</span>
+      </div>
+    </div>
+
+    <div class="who">
+      <div><label for="nm">Name</label><input type="text" id="nm" maxlength="30" autocomplete="off" placeholder="Detective name"></div>
+      <div><label for="cl">Class</label><input type="text" id="cl" maxlength="12" autocomplete="off" placeholder="e.g. 6/2"></div>
+    </div>
+
+    <div class="rules">
+      <h2>🧠 Remember</h2>
+      <ul>
+        <li><b>must</b> = sure it is true</li>
+        <li><b>can’t</b> = sure it is not true</li>
+        <li><b>may / might / could</b> = possible, but not sure</li>
+      </ul>
+      <span class="pat">modal + be / have</span>
+    </div>
+
+    <div class="cases" id="cases"></div>
+    <button class="big" id="finish" disabled>Solve all 3 cases to see your result</button>
+  </section>
+
+  <!-- STAGE -->
+  <section id="stage" class="screen"></section>
+
+  <!-- RESULTS -->
+  <section id="results" class="screen"></section>
+</div>
+<footer>Created by T. Badria Alfalahi</footer>
+<canvas id="fx"></canvas>
+
+<script>
+(function(){
+"use strict";
+/* ---------- floating paws ---------- */
+var pw=document.querySelector('.paws');
+for(var p=0;p<9;p++){var s=document.createElement('span');s.textContent='🐾';s.style.left=(p*11+Math.random()*6)+'%';s.style.animationDuration=(16+Math.random()*14)+'s';s.style.animationDelay=(-Math.random()*20)+'s';pw.appendChild(s);}
+
+/* ---------- content ---------- */
+var STAGES={
+ A:{letter:'A',title:'Circle the correct answer',sub:'must or can’t · might or must',type:'slot',
+  task:'1. Circle the correct answer.',
+  items:[
+   {clue:{i:'🪶',l:'feathers + beak'},sus:{i:'🐦',l:'bird'},pre:'This animal has feathers and a beak. It',post:'be a bird.',opts:[['must','must'],['cant','can’t']],ans:'must',
+    why:'Feathers and a beak = a bird. We are 100% sure, so we say <b>must</b>.'},
+   {clue:{i:'🦵',l:'no legs'},sus:{i:'🐪',l:'camel'},pre:'This animal has no legs. It',post:'be a camel.',opts:[['must','must'],['cant','can’t']],ans:'cant',
+    why:'A camel has four legs. No legs = not a camel, so we say <b>can’t</b>.'},
+   {clue:{i:'🐾',l:'only a tail'},sus:{i:'🐱',l:'cat'},hide:true,pre:'I can see a tail, but nothing else. It',post:'be a cat.',opts:[['might','might'],['must','must']],ans:'might',
+    why:'A tail is only a small clue. Many animals have tails, so it is possible but not sure: <b>might</b>.'},
+   {clue:{i:'🐟',l:'a fish'},sus:{i:'🧶',l:'fur'},pre:'This animal is a fish. It',post:'have fur.',opts:[['must','must'],['cant','can’t']],ans:'cant',
+    why:'Fish have scales, not fur. We are sure it is not true: <b>can’t</b>.'}
+  ]},
+ B:{letter:'B',title:'Complete the sentence',sub:'must · can’t · may / might / could',type:'slot',
+  task:'2. Complete with must, can’t, or may / might / could.',
+  items:[
+   {clue:{i:'🌫️',l:'can’t see clearly'},sus:{i:'🦊',l:'fox'},hide:true,pre:'I can’t see the animal clearly. It',post:'be a fox.',opts:[['must','must'],['cant','can’t'],['maybe','may / might / could']],ans:'maybe',
+    why:'We can’t see clearly, so we are not sure. Use <b>may / might / could</b>.',note:'Tip: may, might and could all work here!'},
+   {clue:{i:'🐪',l:'a camel'},sus:{i:'⛰️',l:'a hump'},pre:'It is a camel. It',post:'have a hump.',opts:[['must','must'],['cant','can’t'],['maybe','may / might / could']],ans:'must',
+    why:'We know it is a camel, and camels have a hump. We are sure: <b>must</b>.'},
+   {clue:{i:'🪶',l:'feathers'},sus:{i:'🐍',l:'snake'},pre:'It has feathers. It',post:'be a snake.',opts:[['must','must'],['cant','can’t'],['maybe','may / might / could']],ans:'cant',
+    why:'Snakes don’t have feathers. We are sure it is not true: <b>can’t</b>.'}
+  ]},
+ C:{letter:'C',title:'Mystery animal: think, write, share',sub:'explain with because · write 2 clues',type:'pick',
+  task:'3. Mystery animal: Think, write, and share.',
+  items:[
+   {clue:{i:'🌊',l:'lives in the sea, has fins'},sus:{i:'❓',l:'mystery'},line:'Clue: This animal lives in the sea and has fins. What can you say?',
+    opts:[['a','It must be a fish because it has fins.'],['b','It can’t be a fish because it has fins.'],['c','It might be a camel because it has fins.']],ans:'a',
+    why:'Fins + the sea = fish. We are sure, and we give the reason with <b>because</b>.'},
+   {clue:{i:'🐪',l:'long neck and a hump'},sus:{i:'❓',l:'mystery'},line:'Clue: This animal has a long neck and a hump. What can you say?',
+    opts:[['a','It can’t be a camel because it has a hump.'],['b','It must be a snake because it has a hump.'],['c','It must be a camel because it has a hump.']],ans:'c',
+    why:'A hump belongs to a camel. <b>must be a camel because it has a hump</b> is logical.'},
+   {clue:{i:'🧡',l:'orange fur, bushy tail'},sus:{i:'❓',l:'mystery'},line:'Clue: I can only see orange fur and a bushy tail. What can you say?',
+    opts:[['a','It must be a fish because it has a tail.'],['b','It can’t be a fox because it has fur.'],['c','It could be a fox because it has orange fur and a bushy tail.']],ans:'c',
+    why:'We can’t see the whole animal, so we aren’t 100% sure: <b>could</b> + because.'}
+  ]}
+};
+var PTS_FIRST=10,PTS_SECOND=5,WRITE_MAX=20;
+var MAX=0;for(var k in STAGES)MAX+=STAGES[k].items.length*PTS_FIRST;MAX+=WRITE_MAX;
+
+/* ---------- state ---------- */
+var S;
+function fresh(){S={res:{A:[],B:[],C:[]},write:{done:false,pts:0,c1:'',c2:'',animal:'',bec:''},cur:null,sound:S?S.sound:true};}
+S=null;fresh();
+
+function $(id){return document.getElementById(id)}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function stagePts(id){var t=0;S.res[id].forEach(function(r){if(r)t+=r.pts});if(id==='C')t+=S.write.pts;return t}
+function total(){return stagePts('A')+stagePts('B')+stagePts('C')}
+function stageDone(id){var n=STAGES[id].items.length,c=0;S.res[id].forEach(function(r){if(r&&r.done)c++});if(c<n)return false;return id==='C'?S.write.done:true}
+function stageCount(id){var c=0;S.res[id].forEach(function(r){if(r&&r.done)c++});return c}
+function updScore(){$('sc').textContent=total();$('mx').textContent=MAX}
+function show(id){['home','stage','results'].forEach(function(s){$(s).classList.toggle('on',s===id)});window.scrollTo(0,0)}
+
+/* ---------- sound ---------- */
+var AC=null;
+function tone(f,d,t,v){if(!S.sound)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.value=v||.12;o.connect(g);g.connect(AC.destination);var n=AC.currentTime;g.gain.setValueAtTime(v||.12,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.start(n);o.stop(n+d)}catch(e){}}
+function sOk(){tone(660,.14);setTimeout(function(){tone(880,.22)},120)}
+function sBad(){tone(200,.25,'sawtooth',.08)}
+function sWin(){[523,659,784,1046].forEach(function(f,i){setTimeout(function(){tone(f,.25)},i*130)})}
+$('snd').onclick=function(){S.sound=!S.sound;this.textContent=S.sound?'🔊':'🔇'};
+
+/* ---------- confetti ---------- */
+var cv=$('fx'),cx=cv.getContext('2d'),parts=[],run=false;
+function rs(){cv.width=innerWidth;cv.height=innerHeight}rs();addEventListener('resize',rs);
+function confetti(n){var cols=['#13707a','#f2b632','#f4b58a','#2e9e6b','#ff7a8a','#7ad0c8'];for(var i=0;i<n;i++)parts.push({x:innerWidth/2+(Math.random()-.5)*160,y:innerHeight*.35,vx:(Math.random()-.5)*12,vy:-Math.random()*11-3,r:Math.random()*6+4,c:cols[i%cols.length],a:Math.random()*6,life:90+Math.random()*50});if(!run){run=true;frame()}}
+function frame(){cx.clearRect(0,0,cv.width,cv.height);parts=parts.filter(function(q){return q.life>0});parts.forEach(function(q){q.x+=q.vx;q.y+=q.vy;q.vy+=.35;q.a+=.2;q.life--;cx.save();cx.translate(q.x,q.y);cx.rotate(q.a);cx.fillStyle=q.c;cx.fillRect(-q.r/2,-q.r/2,q.r,q.r*.6);cx.restore()});if(parts.length)requestAnimationFrame(frame);else run=false}
+
+/* ---------- home ---------- */
+function renderHome(){
+  var h='';
+  ['A','B','C'].forEach(function(id){
+    var st=STAGES[id],d=stageDone(id),n=st.items.length+(id==='C'?1:0),c=stageCount(id)+(id==='C'&&S.write.done?1:0);
+    h+='<button class="case'+(d?' done':'')+'" data-s="'+id+'"><span class="letter">'+(d?'✓':st.letter)+'</span><span class="t"><b>'+esc(st.title)+'</b><span>'+esc(st.sub)+'</span></span><span class="st">'+(d?stagePts(id)+' pts':c+' / '+n)+'</span></button>';
+  });
+  $('cases').innerHTML=h;
+  [].forEach.call(document.querySelectorAll('.case'),function(b){b.onclick=function(){startStage(b.dataset.s)}});
+  var all=stageDone('A')&&stageDone('B')&&stageDone('C');
+  var f=$('finish');f.disabled=!all;f.textContent=all?'🏆 See my result':'Solve all 3 cases to see your result';
+  updScore();
+}
+$('finish').onclick=function(){if(!this.disabled)renderResults()};
+
+/* ---------- stage ---------- */
+function startStage(id){
+  S.name=$('nm').value.trim();S.cls=$('cl').value.trim();
+  var st=STAGES[id],i=0;
+  while(i<st.items.length&&S.res[id][i]&&S.res[id][i].done)i++;
+  S.cur={id:id,i:i};
+  if(i>=st.items.length){id==='C'?renderWrite():renderHomeBack();return}
+  renderItem();
+}
+function renderHomeBack(){renderHome();show('home')}
+function dots(id,cur,extra){
+  var st=STAGES[id],h='<div class="dots">';
+  st.items.forEach(function(_,i){var r=S.res[id][i],c='';if(r&&r.done)c=r.pts>0?'ok':'no';else if(i===cur)c='now';h+='<i class="'+c+'"></i>'});
+  if(extra){h+='<i class="'+(S.write.done?'ok':(cur===st.items.length?'now':''))+'"></i>'}
+  return h+'</div>';
+}
+function renderItem(){
+  var id=S.cur.id,i=S.cur.i,st=STAGES[id],it=st.items[i];
+  var r=S.res[id][i]||(S.res[id][i]={tries:0,done:false,pts:0,wrong:[]});
+  if(!r.wrong)r.wrong=[];
+  var h='<div class="sbar"><button class="ghost" id="back">← Cases</button><h2>Case '+st.letter+' · '+(i+1)+' / '+st.items.length+'</h2></div>';
+  h+=dots(id,i,id==='C');
+  h+='<div class="card"><span class="task">'+esc(st.task)+'</span>';
+  h+='<div class="evid"><div class="ebox"><span class="ic">'+it.clue.i+'</span><small>Clue: '+esc(it.clue.l)+'</small></div><span class="arrow">➜</span><div class="ebox sus'+(it.hide&&!r.done?' hid':'')+'" id="sus"><span class="ic">'+it.sus.i+'</span><small>Suspect: '+esc(it.sus.l)+'</small></div></div>';
+  if(st.type==='slot'){
+    h+='<div class="sent">'+esc(it.pre)+' <span class="slot'+(r.done?' ok':'')+'" id="slot">'+(r.done?esc(label(it,it.ans)):'?')+'</span> '+esc(it.post)+'</div>';
+  }else{
+    h+='<div class="sent">'+esc(it.line)+'</div>';
+  }
+  h+='<div class="opts">';
+  it.opts.forEach(function(o){h+='<button class="opt'+(st.type==='pick'?' long':'')+'" data-k="'+o[0]+'">'+esc(o[1])+'</button>'});
+  h+='</div><div class="fb" id="fb"></div></div><div class="nextrow" id="nx"></div>';
+  $('stage').innerHTML=h;show('stage');
+  $('back').onclick=renderHomeBack;
+  [].forEach.call(document.querySelectorAll('.opt'),function(b){
+    if(r.wrong.indexOf(b.dataset.k)>-1){b.classList.add('bad');b.disabled=true}
+    b.onclick=function(){choose(b)};
+  });
+  if(r.done){finishItemUI(it,r,true)}
+}
+function label(it,k){for(var j=0;j<it.opts.length;j++)if(it.opts[j][0]===k)return it.opts[j][1];return k}
+function choose(btn){
+  var id=S.cur.id,i=S.cur.i,it=STAGES[id].items[i],r=S.res[id][i];
+  if(r.done)return;
+  var k=btn.dataset.k;
+  if(k===it.ans){
+    r.pts=r.tries===0?PTS_FIRST:PTS_SECOND;r.done=true;sOk();confetti(r.tries===0?50:24);
+    btn.classList.add('good');
+    var sl=$('slot');if(sl){sl.textContent=label(it,it.ans);sl.classList.add('ok')}
+    finishItemUI(it,r,false);
+  }else{
+    r.tries++;r.wrong.push(k);btn.classList.add('bad');btn.disabled=true;sBad();
+    var fb=$('fb');
+    if(r.tries>=2){
+      r.done=true;r.pts=0;
+      [].forEach.call(document.querySelectorAll('.opt'),function(b){if(b.dataset.k===it.ans)b.classList.add('good')});
+      var sl=$('slot');if(sl){sl.textContent=label(it,it.ans);sl.classList.add('ok')}
+      finishItemUI(it,r,false);
+    }else{
+      fb.className='fb show b';fb.innerHTML='🔎 Not quite. Look at the clue again and try one more time!';
+    }
+  }
+  updScore();
+}
+function finishItemUI(it,r,again){
+  var fb=$('fb'),good=r.pts>0;
+  fb.className='fb show '+(good?'g':'b');
+  fb.innerHTML=(good?(r.pts===PTS_FIRST?'🌟 Brilliant deduction! +'+r.pts:'👍 Good! +'+r.pts+' (second try)'):'💡 The answer is shown. 0 points this time.')+'<br>'+it.why+(it.note?'<br>'+esc(it.note):'');
+  var s=$('sus');if(s)s.classList.remove('hid');
+  [].forEach.call(document.querySelectorAll('.opt'),function(b){b.disabled=true;if(b.dataset.k===it.ans)b.classList.add('good')});
+  var id=S.cur.id,last=S.cur.i===STAGES[id].items.length-1;
+  var nx=$('nx');
+  nx.innerHTML='<button class="big" id="nb">'+(last?(id==='C'?'Next: write your clues ✏️':'Finish this case ✓'):'Next clue ➜')+'</button>';
+  $('nb').onclick=function(){
+    if(!last){S.cur.i++;renderItem()}
+    else if(id==='C'){renderWrite()}
+    else{renderHomeBack();if(stageDone(id))sWin()}
+  };
+  updScore();
+}
+
+/* ---------- writing (case C, part 2) ---------- */
+function renderWrite(){
+  S.cur={id:'C',i:STAGES.C.items.length};
+  var w=S.write;
+  var h='<div class="sbar"><button class="ghost" id="back">← Cases</button><h2>Case C · your mystery animal</h2></div>'+dots('C',S.cur.i,true);
+  h+='<div class="card"><span class="task">Choose an animal. Keep it secret. Write two clues for your partner.</span>';
+  h+='<div class="fld"><label for="an">🐾 My secret animal</label><input type="text" id="an" maxlength="30" autocomplete="off" placeholder="e.g. camel" value="'+esc(w.animal)+'"></div>';
+  h+='<div class="fld"><label for="c1">Clue 1</label><textarea id="c1" rows="2" maxlength="140" placeholder="It has … / It lives in … / It can …">'+esc(w.c1)+'</textarea><div class="note" id="n1"></div></div>';
+  h+='<div class="fld"><label for="c2">Clue 2</label><textarea id="c2" rows="2" maxlength="140" placeholder="It doesn’t have … / It eats …">'+esc(w.c2)+'</textarea><div class="note" id="n2"></div></div>';
+  h+='<div class="fld"><label for="bc">Can you explain your answer using <i>because</i>?</label><textarea id="bc" rows="2" maxlength="160" placeholder="It must be a … because …">'+esc(w.bec)+'</textarea><p class="hint">Use must / can’t / may / might / could + because. Example: It must be a bird because it has feathers.</p><div class="note" id="n3"></div></div>';
+  h+='<div class="nextrow"><button class="big" id="chk">🔍 Check my clues</button></div>';
+  h+='<div class="file" id="file"></div></div><div class="nextrow" id="nx"></div>';
+  $('stage').innerHTML=h;show('stage');
+  $('back').onclick=renderHomeBack;
+  $('chk').onclick=checkWrite;
+  if(w.done)checkWrite(true);
+}
+function words(t){return t.trim().split(/\s+/).filter(function(x){return x.length>0&&/[A-Za-z]/.test(x)}).length}
+function checkWrite(silent){
+  var a=$('an').value.trim(),c1=$('c1').value.trim(),c2=$('c2').value.trim(),bc=$('bc').value.trim();
+  var pts=0,n1=$('n1'),n2=$('n2'),n3=$('n3');
+  if(words(c1)>=3){pts+=5;n1.className='note g';n1.textContent='✅ Great clue! +5'}else{n1.className='note b';n1.textContent='✏️ Write a full clue (at least 3 words).'}
+  if(words(c2)>=3){pts+=5;n2.className='note g';n2.textContent='✅ Nice second clue! +5'}else{n2.className='note b';n2.textContent='✏️ Write a full clue (at least 3 words).'}
+  var low=bc.toLowerCase().replace(/[’‘`]/g,"'");
+  var hasM=/\b(must|can't|cant|may|might|could)\b/.test(low),hasB=/\bbecause\b/.test(low);
+  if(hasM&&hasB&&words(bc)>=5){pts+=10;n3.className='note g';n3.textContent='✅ Excellent! You used a modal verb and because. +10'}
+  else if(hasB&&!hasM){n3.className='note b';n3.textContent='💡 Add a modal: must, can’t, may, might or could.'}
+  else if(hasM&&!hasB){n3.className='note b';n3.textContent='💡 Add because and give your reason.'}
+  else{n3.className='note b';n3.textContent='💡 Write a sentence like: It must be a … because …'}
+  var w=S.write;w.animal=a;w.c1=c1;w.c2=c2;w.bec=bc;
+  if(!silent){w.pts=Math.max(w.pts,pts);if(pts>0||c1||c2||bc){w.done=true}}
+  if(!silent&&pts===WRITE_MAX){sOk();confetti(60)}else if(!silent){pts>0?sOk():sBad()}
+  var f=$('file');
+  if(w.done&&(c1||c2)){
+    f.className='file show';
+    f.innerHTML='<h3>📁 Case file for my partner</h3><p>🔎 Clue 1: '+esc(c1||'…')+'</p><p>🔎 Clue 2: '+esc(c2||'…')+'</p><div class="because">Partner: read the clues and guess the animal! 🕵️‍♀️'+(bc?'<br>“'+esc(bc)+'”':'')+'</div>';
+  }
+  if(w.done){
+    var nx=$('nx');nx.innerHTML='<button class="big" id="nb">Finish this case ✓</button>';
+    $('nb').onclick=function(){renderHomeBack();sWin();confetti(70)};
+  }
+  updScore();
+}
+
+/* ---------- results ---------- */
+function renderResults(){
+  var t=total(),pct=Math.round(t/MAX*100),stars=pct>=90?3:pct>=70?2:pct>=40?1:0;
+  var rank=pct>=90?'Master Detective 🕵️‍♀️':pct>=70?'Chief Detective 🔍':pct>=40?'Junior Detective 🐾':'Detective Trainee 📘';
+  var nm=S.name||'Detective';
+  var msg=pct>=90?'Amazing, '+esc(nm)+'! Your deductions are super sharp!':pct>=70?'Well done, '+esc(nm)+'! You are a great detective!':pct>=40?'Good effort, '+esc(nm)+'! Play again to find every clue.':'Keep going, '+esc(nm)+'! Every detective learns by trying again.';
+    var sh='';for(var i=0;i<3;i++)sh+='<span class="'+(i<stars?'':'off')+'">⭐</span>';
+  var h='<div class="card res"><h2>Case closed!</h2>'+(S.name?'<div style="font-weight:800;font-size:19px">'+esc(S.name)+(S.cls?' · '+esc(S.cls):'')+'</div>':'')+'<div class="stars">'+sh+'</div><div class="bigscore">'+t+' / '+MAX+'</div><div style="font-weight:800;font-size:20px">'+pct+'%</div><div class="rank">'+rank+'</div>';
+  h+='<div class="brk"><div><span>A · Circle the answer</span><span>'+stagePts('A')+' / '+STAGES.A.items.length*PTS_FIRST+'</span></div><div><span>B · Complete</span><span>'+stagePts('B')+' / '+STAGES.B.items.length*PTS_FIRST+'</span></div><div><span>C · Mystery animal</span><span>'+stagePts('C')+' / '+(STAGES.C.items.length*PTS_FIRST+WRITE_MAX)+'</span></div></div>';
+  h+='<p class="msg">'+msg+'</p>';
+  h+='<div class="btns"><button class="big" id="again" style="margin:0">🔄 Play again</button><button class="ghost" id="rev">← Back to cases</button></div></div>';
+  $('results').innerHTML=h;show('results');sWin();confetti(pct>=70?140:50);
+  $('again').onclick=function(){var n=$('nm').value,c=$('cl').value;fresh();$('nm').value=n;$('cl').value=c;renderHomeBack()};
+  $('rev').onclick=renderHomeBack;
+}
+
+renderHome();
+})();
+</script>
+</body>
+</html>
